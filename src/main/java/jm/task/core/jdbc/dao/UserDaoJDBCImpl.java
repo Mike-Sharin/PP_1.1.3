@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS user ( id bigint NOT NULL AUTO_INCREMENT," +
+    private final String SQL_CREATE_TABLE = "CREATE TABLE IF NOT EXISTS users ( id bigint NOT NULL AUTO_INCREMENT," +
                                             " name VARCHAR(45) NOT NULL,  lastName VARCHAR(45) NOT NULL," +
                                             " age smallint NOT NULL,  PRIMARY KEY (id));";
-    private final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS user";
-    private final String SQL_INSERT_NEW_ROW = "INSERT INTO user (name, lastName, age) VALUES (?, ?, ?)";
-    private final String SQL_CLEAN_TABLE = "DELETE FROM user";
-    private final String SQL_SELECT_ROWS = "SELECT * FROM user";
+    private final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS users";
+    private final String SQL_INSERT_NEW_ROW = "INSERT INTO users (name, lastName, age) VALUES (?, ?, ?)";
+    private final String SQL_CLEAN_TABLE = "DELETE FROM users";
+    private final String SQL_SELECT_ROWS = "SELECT * FROM users";
     private final Connection connection = Util.getConnection();
     private PreparedStatement preparedStatement;
 
@@ -25,22 +25,28 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
-    public void createUsersTable() {
+    private void procedureUserTable(String sql_create_table) {
         try {
-            preparedStatement = connection.prepareStatement(SQL_CREATE_TABLE);
+            connection.setAutoCommit(false);
+            preparedStatement = connection.prepareStatement(sql_create_table);
             preparedStatement.execute();
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
+    public void createUsersTable() {
+        procedureUserTable(SQL_CREATE_TABLE);
+    }
+
     public void dropUsersTable() {
-        try {
-            preparedStatement = connection.prepareStatement(SQL_DROP_TABLE);
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        procedureUserTable(SQL_DROP_TABLE);
     }
 
     public void saveUser(String name, String lastName, byte age) {
@@ -51,20 +57,21 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setByte(3, age);
 
             preparedStatement.execute();
+            connection.commit();
 
             System.out.printf("User с именем – '%s' добавлен в базу данных\n", name);
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
 
     public void removeUserById(long id) {
-        try {
-            preparedStatement = connection.prepareStatement(SQL_CLEAN_TABLE + " WHERE id = " + id);
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        procedureUserTable(SQL_CLEAN_TABLE + " WHERE id = " + id);
     }
 
     public List<User> getAllUsers() {
@@ -84,18 +91,20 @@ public class UserDaoJDBCImpl implements UserDao {
                 System.out.println(user);
             }
 
+            connection.commit();
+
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
         return users;
     }
 
     public void cleanUsersTable() {
-        try {
-            preparedStatement = connection.prepareStatement(SQL_CLEAN_TABLE);
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        procedureUserTable(SQL_CLEAN_TABLE);
     }
 }
