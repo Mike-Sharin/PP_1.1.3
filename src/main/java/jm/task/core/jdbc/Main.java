@@ -1,34 +1,25 @@
 package jm.task.core.jdbc;
 
-import jm.task.core.jdbc.dao.UserDao;
-import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
-import jm.task.core.jdbc.util.Util;
-
-import java.sql.Connection;
-import java.sql.SQLException;
+import jm.task.core.jdbc.service.UserService;
+import jm.task.core.jdbc.service.UserServiceImpl;
 
 public class Main {
 
     public static void main(String[] args) {
         // реализуйте алгоритм здесь
 
-        try(Connection connection = new Util().getConnection()) {
+        UserService userService = new UserServiceImpl();
 
-            UserDao userDao = new UserDaoJDBCImpl();
+        userService.createUsersTable();
 
-            userDao.createUsersTable();
+        userService.saveUser("Alex", "Bolduin", (byte) 20);
+        userService.saveUser("Bob", "Faler", (byte) 25);
+        userService.saveUser("Elena", "Prekrasnaya", (byte) 31);
+        userService.saveUser("Jim", "Tonic", (byte) 38);
 
-            userDao.saveUser("Alex", "Bolduin", (byte) 20);
-            userDao.saveUser("Bob", "Faler", (byte) 25);
-            userDao.saveUser("Elena", "Prekrasnaya", (byte) 31);
-            userDao.saveUser("Jim", "Tonic", (byte) 38);
-
-            userDao.removeUserById(1);
-            userDao.getAllUsers();
-            userDao.cleanUsersTable();
-            userDao.dropUsersTable();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        userService.removeUserById(1);
+        userService.getAllUsers();
+        userService.cleanUsersTable();
+        userService.dropUsersTable();
     }
 }
