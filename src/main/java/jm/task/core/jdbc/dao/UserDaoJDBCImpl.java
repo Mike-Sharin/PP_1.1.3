@@ -87,7 +87,6 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> users = new ArrayList<>();
         try {
             if (connection != null) {
-                connection.setAutoCommit(false);
                 preparedStatement = connection.prepareStatement(SQL_SELECT_ROWS);
                 ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -97,24 +96,14 @@ public class UserDaoJDBCImpl implements UserDao {
                             (byte) resultSet.getInt("age"));
                     user.setId(resultSet.getLong("id"));
                     users.add(user);
-                }
 
-                connection.commit();
-                connection.setAutoCommit(true);
-
-                for (User user : users) {
                     System.out.println(user);
                 }
             }
         } catch (SQLException e) {
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
             e.printStackTrace();
         }
-        
+
         return users;
     }
 
