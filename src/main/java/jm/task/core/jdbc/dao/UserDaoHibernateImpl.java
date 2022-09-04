@@ -32,10 +32,6 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
@@ -66,10 +62,6 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
@@ -88,10 +80,6 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 
@@ -137,10 +125,6 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             e.printStackTrace();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
         }
     }
 }
